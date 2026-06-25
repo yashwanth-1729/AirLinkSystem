@@ -1,3 +1,6 @@
 # Generated SQLite database file (created at runtime)
 airlink.db
 *.db
+
+# Compiled output (Eclipse regenerates this on build)
+bin/
