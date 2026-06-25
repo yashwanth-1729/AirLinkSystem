@@ -7,6 +7,8 @@ import airlink.trees.FlightBST;
 import airlink.graph.Graph;
 import airlink.algorithms.Dijkstra;
 import airlink.sorting.FlightSorting;
+import airlink.db.Database;
+import java.util.List;
 
 public class Main {
 
@@ -19,6 +21,28 @@ public class Main {
 
         Flight[] flights = new Flight[100];
         int flightCount = 0;
+
+        // Set up the database and load any previously saved data back into the
+        // in-memory data structures so the system resumes where it left off.
+        Database.initialize();
+
+        List<Flight> savedFlights = Database.loadFlights();
+        for (Flight savedFlight : savedFlights) {
+            if (flightCount >= flights.length) {
+                break;
+            }
+            bst.insert(savedFlight);
+            flights[flightCount] = savedFlight;
+            flightCount++;
+        }
+
+        for (String[] route : Database.loadRoutes()) {
+            graph.addRoute(route[0], route[1]);
+        }
+
+        if (flightCount > 0) {
+            System.out.println("Loaded " + flightCount + " flight(s) from database.");
+        }
 
         while (true) {
 
@@ -62,6 +86,8 @@ public class Main {
                     flights[flightCount] = flight;
                     flightCount++;
 
+                    Database.saveFlight(flight);
+
                     System.out.println("Flight Added Successfully!");
 
                     break;
@@ -103,6 +129,8 @@ public class Main {
                     String dest = sc.nextLine();
 
                     graph.addRoute(src, dest);
+
+                    Database.saveRoute(src, dest);
 
                     System.out.println("Route Added Successfully!");
 
